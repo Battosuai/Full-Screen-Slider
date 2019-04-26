@@ -1,61 +1,66 @@
-const slides = document.querySelectorAll('.slide');
-const prev = document.querySelector('#prev');
-const next = document.querySelector('#next');
-const intervalTime = 5000;
-const auto = true;
-let slideInterval;
+const slides = document.querySelectorAll('.slider-container .slide'); // get all the slides
+const eraser = document.querySelector('.eraser'); // the eraser
+const prev = document.getElementById('previous'); // previous button
+const next = document.getElementById('next'); // next button
+const intervalTime = 5000; // time until nextSlide triggers in miliseconds
+const eraserActiveTime = 700; // time to wait until the .eraser goes all the way
+let sliderInterval; // variable used to save the setInterval and clear it when needed
 
-const nextSlide = () =>{
-    const current = document.querySelector('.current');
+const nextSlide = () => {
+    // Step 1.
+    eraser.classList.add('active');
 
-    current.classList.remove('current');
+    // Step 2.
+    setTimeout(() => {
+        // Step 3.
+        const active = document.querySelector('.slide.active');
+        active.classList.toggle('active');
 
-    if(current.nextElementSibling){
-        current.nextElementSibling.classList.add('current')
-    }else{
-        slides[0].classList.add('current');
-    }
+        // Step 4.
+        if (active.nextElementSibling) {
+            active.nextElementSibling.classList.toggle('active');
+        } else {
+            // Step 5.
+            slides[0].classList.toggle('active');
+        }
 
-    setTimeout(()=>{
-        current.classList.remove('current');
-    })
-}
+        // Step 6.
+        setTimeout(() => {
+            eraser.classList.remove('active');
+        }, 200);
+    }, eraserActiveTime);
+};
 
-const prevSlide = () =>{
-    const current = document.querySelector('.current');
+const prevSlide = () => {
+    eraser.classList.add('active');
+    setTimeout(() => {
+        const active = document.querySelector('.slide.active');
+        active.classList.toggle('active');
 
-    current.classList.remove('current');
+        // The *changed* part from the nextSlide code
+        if (active.previousElementSibling) {
+            active.previousElementSibling.classList.toggle('active');
+        } else {
+            slides[slides.length - 1].classList.toggle('active');
+        }
+        // End of the changed part
 
-    if(current.previousElementSibling){
-        current.previousElementSibling.classList.add('current')
-    }else{
-        slides[slides.length - 1].classList.add('current');
-    }
+        setTimeout(() => {
+            eraser.classList.remove('active');
+        }, 200);
+    }, eraserActiveTime);
+};
 
-    setTimeout(()=>{
-        current.classList.remove('current');
-    },200)
-}
+sliderInterval = setInterval(nextSlide, intervalTime);
 
-
-//Button Events
-
-next.addEventListener('click', e=>{
+next.addEventListener('click', () => {
     nextSlide();
-    if(auto){
-        clearInterval();
-        slideInterval = setInterval(nextSlide, intervalTime);
-    }
+    clearInterval(sliderInterval);
+    sliderInterval = setInterval(nextSlide, intervalTime);
 });
 
-prev.addEventListener('click', e=>{
+prev.addEventListener('click', () => {
     prevSlide();
-    if(auto){
-        clearInterval();
-        slideInterval = setInterval(nextSlide, intervalTime);
-    }
+    clearInterval(sliderInterval);
+    sliderInterval = setInterval(nextSlide, intervalTime);
 });
-
-if(auto){
-    slideInterval = setInterval(nextSlide, intervalTime);
-}
